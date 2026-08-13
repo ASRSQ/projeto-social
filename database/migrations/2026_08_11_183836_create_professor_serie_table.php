@@ -1,3 +1,4 @@
+```php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,20 +7,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('professor_serie', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('professor_id')
+                ->constrained('professores')
+                ->cascadeOnDelete();
+
+            $table->foreignId('serie_id')
+                ->constrained('series')
+                ->cascadeOnDelete();
+
             $table->timestamps();
+
+            $table->unique(['professor_id', 'serie_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('professor_serie');
