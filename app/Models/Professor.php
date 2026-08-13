@@ -14,7 +14,6 @@ class Professor extends Model
 
     protected $fillable = [
         'nome',
-        'disciplina',
     ];
 
     public function series(): BelongsToMany
@@ -24,6 +23,16 @@ class Professor extends Model
             'professor_serie',
             'professor_id',
             'serie_id'
+        )->withTimestamps();
+    }
+
+    public function disciplinas(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Disciplina::class,
+            'disciplina_professor',
+            'professor_id',
+            'disciplina_id'
         )->withTimestamps();
     }
 }

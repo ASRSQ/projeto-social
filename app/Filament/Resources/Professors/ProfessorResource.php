@@ -33,10 +33,13 @@ class ProfessorResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\TextInput::make('disciplina')
-                    ->label('Disciplina')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Select::make('disciplinas')
+                    ->label('Disciplinas')
+                    ->relationship('disciplinas', 'nome')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->required(),
 
                 Forms\Components\Select::make('series')
                     ->label('Séries')
@@ -65,17 +68,19 @@ class ProfessorResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('disciplina')
-                    ->label('Disciplina')
-                    ->searchable()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('disciplinas.nome')
+                    ->label('Disciplinas')
+                    ->badge(),
 
                 Tables\Columns\TextColumn::make('series')
                     ->label('Séries')
                     ->badge()
                     ->getStateUsing(function (Professor $record): array {
                         return $record->series
-                            ->map(fn (Serie $serie) => "{$serie->ano} - {$serie->curso}")
+                            ->map(
+                                fn (Serie $serie) =>
+                                    "{$serie->ano} - {$serie->curso}"
+                            )
                             ->toArray();
                     }),
 
