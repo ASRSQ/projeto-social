@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Series;
 
-use App\Filament\Resources\SerieResource\Pages;
+use App\Filament\Resources\Series\Pages;
 use App\Models\Serie;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -62,10 +63,12 @@ class SerieResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
