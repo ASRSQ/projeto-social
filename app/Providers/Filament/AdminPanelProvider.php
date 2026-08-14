@@ -28,9 +28,14 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->colors([
-                'primary' => Color::Amber,
-            ])
+          ->colors([
+    'primary' => '#006400',   // Verde escuro: barra superior e botões principais
+    'success' => '#2E8B57',   // Verde médio para mensagens de sucesso
+    'warning' => '#9ACD32',   // Verde amarelado para avisos
+    'danger'  => '#228B22',   // Verde floresta para alertas
+])
+->brandName('Portal Professor') // muda o texto "Laravel" na barra
+->darkMode(false)               // garante fundo branco no painel
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([Dashboard::class])
