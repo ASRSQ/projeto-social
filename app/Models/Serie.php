@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Serie extends Model
 {
@@ -25,5 +26,10 @@ class Serie extends Model
             'serie_id',
             'professor_id'
         )->withTimestamps();
+    }
+
+    public function alunos(): HasMany
+    {
+        return $this->hasMany(Aluno::class);
     }
 }
