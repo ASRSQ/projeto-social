@@ -1,0 +1,12 @@
+* [33me3e502c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mocorrencia[m[33m, [m[1;31morigin/ocorrencia[m[33m)[m Adicionando o banco de alunos
+* [33mf794d75[m[33m ([m[1;31morigin/estilo[m[33m)[m cores alteradas
+* [33m1c117de[m Adicionando o DisciplinasSource, Model das Disciplinas e Migration, trocando a seleção de disciplina para relação.
+* [33mae92e88[m Formulário de professor e séries
+* [33ma4b44ec[m Adicionando SerieResource e Models para Professor e Serie
+* [33m2d30b2f[m corrigindo erro database/migrations/2026_08_11_183836_create_professor_serie_table.php
+*   [33m20b133a[m Corrige nome do arquivo .env.example
+[32m|[m[33m\[m  
+* [33m|[m [33m63891fe[m adicionar o .env.exemple
+* [33m|[m [33md87a176[m banco de dados dos professores e séries
+[33m|[m [33m|[m * [33m7ab7896[m[33m ([m[1;35mrefs/stash[m[33m)[m On estilo: Alterações nas migrations de professores
+[33m|[m [33m|[m[33m/[m[35m|[m 
