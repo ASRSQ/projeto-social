@@ -13,6 +13,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -37,7 +39,12 @@ class AlunoResource extends Resource
                 TextInput::make('nome')
                     ->label('Nome')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Get $get, Set $set, ?Aluno $record) => $set(
+                        'numero',
+                        Aluno::numeroDaChamadaPara($get('serie_id'), $get('nome'), $record?->id),
+                    )),
 
                 TextInput::make('matricula')
                     ->label('Matrícula')
@@ -46,6 +53,11 @@ class AlunoResource extends Resource
                     ->minLength(7)
                     ->maxLength(7)
                     ->unique(ignoreRecord: true),
+
+                TextInput::make('numero')
+                    ->label('Número da chamada')
+                    ->disabled()
+                    ->dehydrated(false),
 
                 Select::make('serie_id')
                     ->label('Série')
@@ -58,7 +70,12 @@ class AlunoResource extends Resource
                     )
                     ->required()
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->live()
+                    ->afterStateUpdated(fn (Get $get, Set $set, ?Aluno $record) => $set(
+                        'numero',
+                        Aluno::numeroDaChamadaPara($get('serie_id'), $get('nome'), $record?->id),
+                    )),
             ]);
     }
 
@@ -74,6 +91,10 @@ class AlunoResource extends Resource
                 Tables\Columns\TextColumn::make('matricula')
                     ->label('Matrícula')
                     ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('numero')
+                    ->label('Nº chamada')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('serie.curso')

@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Aluno;
+use App\Models\Serie;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,11 +16,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(AdminUserSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $serie = Serie::create([
+            'curso' => 'Informática',
+            'ano' => '1',
         ]);
+
+        $faker = \Faker\Factory::create('pt_BR');
+        $alunos = collect(range(1, 45))
+            ->map(fn (): array => [
+                'nome' => $faker->name(),
+                'matricula' => $faker->unique()->numerify('#######'),
+            ])
+            ->sortBy('nome', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        foreach ($alunos as $index => $aluno) {
+            Aluno::create([
+                ...$aluno,
+                'numero' => $index + 1,
+                'serie_id' => $serie->id,
+            ]);
+        }
     }
 }
