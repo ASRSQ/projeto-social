@@ -13,7 +13,17 @@ class Aluno extends Model
         'nome',
         'matricula',
         'serie_id',
+        'concluinte',
+        'concluido_em',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'concluinte' => 'boolean',
+            'concluido_em' => 'date',
+        ];
+    }
 
     public function serie(): BelongsTo
     {

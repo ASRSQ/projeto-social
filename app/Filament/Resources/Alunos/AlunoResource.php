@@ -84,9 +84,22 @@ class AlunoResource extends Resource
                 Tables\Columns\TextColumn::make('serie.ano')
                     ->label('Ano')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('conclusao')
+                    ->label('Conclusão')
+                    ->state(fn (Aluno $record): ?string => $record->concluinte
+                        ? "Concluiu a 3º série no curso de {$record->serie->curso} em {$record->concluido_em?->format('Y')}"
+                        : null)
+                    ->wrap(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('concluinte')
+                    ->label('Situação')
+                    ->options([
+                        '0' => 'Alunos ativos',
+                        '1' => 'Concluintes',
+                    ])
+                    ->default('0'),
             ])
             ->recordActions([
                 EditAction::make(),
