@@ -16,9 +16,9 @@ class CreateAluno extends CreateRecord
     public function create(bool $another = false): void
     {
         if (! $this->confirmandoExcessoDeAlunos) {
-            $serieId = $this->form->getRawState()['serie_id'] ?? null;
+            $turmaId = $this->form->getRawState()['turma_id'] ?? null;
 
-            if (filled($serieId) && Aluno::where('serie_id', $serieId)->count() >= 45) {
+            if (filled($turmaId) && Aluno::where('turma_id', $turmaId)->count() >= 45) {
                 $this->mountAction('confirmarExcessoDeAlunos');
 
                 return;

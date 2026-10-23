@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Series\Tables;
+namespace App\Filament\Resources\Turmas\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,7 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class SeriesTable
+class TurmasTable
 {
     public static function configure(Table $table): Table
     {
@@ -16,7 +16,8 @@ class SeriesTable
             ->columns([
                 TextColumn::make('curso')
                     ->searchable(),
-                TextColumn::make('ano')
+                TextColumn::make('serie')
+                    ->label('Série')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()

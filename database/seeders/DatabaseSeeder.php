@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Aluno;
-use App\Models\Serie;
+use App\Models\Turma;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AdminUserSeeder::class);
 
-        $serie = Serie::create([
+        $turma = Turma::create([
             'curso' => 'Informática',
-            'ano' => '1',
+            'serie' => '1',
         ]);
 
         $faker = \Faker\Factory::create('pt_BR');
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             Aluno::create([
                 ...$aluno,
                 'numero' => $index + 1,
-                'serie_id' => $serie->id,
+                'turma_id' => $turma->id,
             ]);
         }
     }

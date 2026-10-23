@@ -6,7 +6,7 @@ use App\Filament\Resources\Alunos\Pages\CreateAluno;
 use App\Filament\Resources\Alunos\Pages\EditAluno;
 use App\Filament\Resources\Alunos\Pages\ListAlunos;
 use App\Models\Aluno;
-use App\Models\Serie;
+use App\Models\Turma;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -43,7 +43,7 @@ class AlunoResource extends Resource
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (Get $get, Set $set, ?Aluno $record) => $set(
                         'numero',
-                        Aluno::numeroDaChamadaPara($get('serie_id'), $get('nome'), $record?->id),
+                        Aluno::numeroDaChamadaPara($get('turma_id'), $get('nome'), $record?->id),
                     )),
 
                 TextInput::make('matricula')
@@ -59,12 +59,12 @@ class AlunoResource extends Resource
                     ->disabled()
                     ->dehydrated(false),
 
-                Select::make('serie_id')
-                    ->label('Série')
+                Select::make('turma_id')
+                    ->label('Turma')
                     ->options(
-                        Serie::all()->mapWithKeys(function ($serie) {
+                        Turma::all()->mapWithKeys(function ($turma) {
                             return [
-                                $serie->id => "{$serie->curso} - {$serie->ano}",
+                                $turma->id => "{$turma->curso} - {$turma->serie}",
                             ];
                         })
                     )
@@ -74,7 +74,7 @@ class AlunoResource extends Resource
                     ->live()
                     ->afterStateUpdated(fn (Get $get, Set $set, ?Aluno $record) => $set(
                         'numero',
-                        Aluno::numeroDaChamadaPara($get('serie_id'), $get('nome'), $record?->id),
+                        Aluno::numeroDaChamadaPara($get('turma_id'), $get('nome'), $record?->id),
                     )),
             ]);
     }
@@ -97,19 +97,15 @@ class AlunoResource extends Resource
                     ->label('Nº chamada')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('serie.curso')
-                    ->label('Curso')
+                Tables\Columns\TextColumn::make('turma.curso')
+                    ->label('Turma')
                     ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('serie.ano')
-                    ->label('Ano')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('conclusao')
                     ->label('Conclusão')
                     ->state(fn (Aluno $record): ?string => $record->concluinte
-                        ? "Concluiu a 3º série no curso de {$record->serie->curso} em {$record->concluido_em?->format('Y')}"
+                        ? "Concluiu a 3ª série do curso de {$record->turma->curso} em {$record->concluido_em?->format('Y')}"
                         : null)
                     ->wrap(),
             ])

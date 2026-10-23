@@ -8,6 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('alunos:promover-series')
+Schedule::command('alunos:promover-turmas')
     ->yearlyOn(1, 1, '00:05')
     ->timezone('America/Fortaleza');

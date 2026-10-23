@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProfessorSerie extends Model
+class ProfessorTurma extends Model
 {
     use HasFactory;
 
-    protected $table = 'professor_serie';
+    protected $table = 'professor_turma';
 
     protected $fillable = [
         'professor_id',
-        'serie_id',
+        'turma_id',
     ];
 
     public function professor(): BelongsTo
@@ -25,11 +25,11 @@ class ProfessorSerie extends Model
         );
     }
 
-    public function serie(): BelongsTo
+    public function turma(): BelongsTo
     {
         return $this->belongsTo(
-            Serie::class,
-            'serie_id'
+            Turma::class,
+            'turma_id'
         );
     }
 }

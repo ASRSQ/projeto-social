@@ -4,13 +4,14 @@ namespace App\Filament\Resources\Professors;
 
 use App\Filament\Resources\Professors\Pages;
 use App\Models\Professor;
-use App\Models\Serie;
+use App\Models\Turma;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProfessorResource extends Resource
 {
@@ -41,16 +42,16 @@ class ProfessorResource extends Resource
                     ->preload()
                     ->required(),
 
-                Forms\Components\Select::make('series')
-                    ->label('Séries')
-                    ->relationship('series', 'curso')
+                Forms\Components\Select::make('turmas')
+                    ->label('Turmas')
+                    ->relationship('turmas', 'curso')
                     ->multiple()
-                    ->searchable(['curso', 'ano'])
+                    ->searchable(['curso', 'serie'])
                     ->preload()
                     ->required()
                     ->getOptionLabelFromRecordUsing(
-                        fn (Serie $record): string =>
-                            "{$record->ano} - {$record->curso}"
+                        fn (Turma $record): string =>
+                            "{$record->serie} - {$record->curso}"
                     ),
             ]);
     }
@@ -65,6 +66,15 @@ class ProfessorResource extends Resource
 
                 Tables\Columns\TextColumn::make('nome')
                     ->label('Nome')
+                    ->formatStateUsing(function (string $state, Professor $record): string {
+                        $turmasComoDiretor = $record->turmasComoDiretor
+                            ->map(fn (Turma $turma): string => "DT da {$turma->serie} série de {$turma->curso}")
+                            ->all();
+
+                        return $turmasComoDiretor === []
+                            ? $state
+                            : $state.' - '.implode(', ', $turmasComoDiretor);
+                    })
                     ->searchable()
                     ->sortable(),
 
@@ -72,14 +82,14 @@ class ProfessorResource extends Resource
                     ->label('Disciplinas')
                     ->badge(),
 
-                Tables\Columns\TextColumn::make('series')
-                    ->label('Séries')
+                Tables\Columns\TextColumn::make('turmas')
+                    ->label('Turmas')
                     ->badge()
                     ->getStateUsing(function (Professor $record): array {
-                        return $record->series
+                        return $record->turmas
                             ->map(
-                                fn (Serie $serie) =>
-                                    "{$serie->ano} - {$serie->curso}"
+                                fn (Turma $turma) =>
+                                    "{$turma->serie} - {$turma->curso}"
                             )
                             ->toArray();
                     }),
@@ -97,6 +107,11 @@ class ProfessorResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['turmas', 'turmasComoDiretor']);
     }
 
     public static function getPages(): array

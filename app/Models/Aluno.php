@@ -14,7 +14,7 @@ class Aluno extends Model
         'nome',
         'matricula',
         'numero',
-        'serie_id',
+        'turma_id',
         'concluinte',
         'concluido_em',
     ];
@@ -30,27 +30,27 @@ class Aluno extends Model
     protected static function booted(): void
     {
         static::saved(function (Aluno $aluno): void {
-            $series = array_unique(array_filter([
-                $aluno->getOriginal('serie_id'),
-                $aluno->serie_id,
+            $turmas = array_unique(array_filter([
+                $aluno->getOriginal('turma_id'),
+                $aluno->turma_id,
             ]));
 
-            static::renumerarSeries($series);
+            static::renumerarTurmas($turmas);
         });
 
         static::deleted(function (Aluno $aluno): void {
-            static::renumerarSeries([$aluno->serie_id]);
+            static::renumerarTurmas([$aluno->turma_id]);
         });
     }
 
-    public static function numeroDaChamadaPara(int|string|null $serieId, ?string $nome, int|string|null $alunoId = null): ?int
+    public static function numeroDaChamadaPara(int|string|null $turmaId, ?string $nome, int|string|null $alunoId = null): ?int
     {
-        if (blank($serieId) || blank($nome)) {
+        if (blank($turmaId) || blank($nome)) {
             return null;
         }
 
         return static::query()
-            ->where('serie_id', $serieId)
+            ->where('turma_id', $turmaId)
             ->when(filled($alunoId), fn ($query) => $query->whereKeyNot($alunoId))
             ->where(function ($query) use ($nome, $alunoId): void {
                 $query->where('nome', '<', $nome)
@@ -65,13 +65,13 @@ class Aluno extends Model
             ->count() + 1;
     }
 
-    /** @param array<int, int|string|null> $serieIds */
-    protected static function renumerarSeries(array $serieIds): void
+    /** @param array<int, int|string|null> $turmaIds */
+    protected static function renumerarTurmas(array $turmaIds): void
     {
-        foreach (array_unique(array_filter($serieIds)) as $serieId) {
-            DB::transaction(function () use ($serieId): void {
+        foreach (array_unique(array_filter($turmaIds)) as $turmaId) {
+            DB::transaction(function () use ($turmaId): void {
                 $alunos = static::query()
-                    ->where('serie_id', $serieId)
+                    ->where('turma_id', $turmaId)
                     ->orderBy('nome')
                     ->orderBy('id')
                     ->get(['id', 'numero']);
@@ -89,8 +89,8 @@ class Aluno extends Model
         }
     }
 
-    public function serie(): BelongsTo
+    public function turma(): BelongsTo
     {
-        return $this->belongsTo(Serie::class);
+        return $this->belongsTo(Turma::class);
     }
 }

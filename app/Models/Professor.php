@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Professor extends Model
 {
@@ -16,13 +17,13 @@ class Professor extends Model
         'nome',
     ];
 
-    public function series(): BelongsToMany
+    public function turmas(): BelongsToMany
     {
         return $this->belongsToMany(
-            Serie::class,
-            'professor_serie',
+            Turma::class,
+            'professor_turma',
             'professor_id',
-            'serie_id'
+            'turma_id'
         )->withTimestamps();
     }
 
@@ -34,5 +35,10 @@ class Professor extends Model
             'professor_id',
             'disciplina_id'
         )->withTimestamps();
+    }
+
+    public function turmasComoDiretor(): HasMany
+    {
+        return $this->hasMany(Turma::class, 'diretor_turma_id');
     }
 }

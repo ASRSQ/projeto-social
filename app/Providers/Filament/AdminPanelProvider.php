@@ -35,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
     'warning' => '#9ACD32',   // Verde amarelado para avisos
     'danger'  => '#228B22',   // Verde floresta para alertas
 ])
-->brandName('Portal Professor') // muda o texto "Laravel" na barra
+            ->brandName('Web Advertências') // muda o texto "Laravel" na barra
             ->darkMode()
             ->themeSwitcher(false)
             ->renderHook(

@@ -3,16 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Models\Aluno;
-use App\Models\Serie;
+use App\Models\Turma;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class PromoverAlunos extends Command
 {
-    protected $signature = 'alunos:promover-series';
+    protected $signature = 'alunos:promover-turmas';
 
-    protected $description = 'Promove alunos de série e registra os concluintes do ano letivo';
+    protected $description = 'Promove alunos de turma e registra os concluintes do ano letivo';
 
     public function handle(): int
     {
@@ -32,30 +32,30 @@ class PromoverAlunos extends Command
                     'updated_at' => now(),
                 ]);
 
-                $seriesPorCurso = Serie::query()->get()->groupBy('curso');
+                $turmasPorCurso = Turma::query()->get()->groupBy('curso');
 
-                foreach ($seriesPorCurso as $curso => $series) {
-                    $seriesPorAno = $series->keyBy(
-                        fn (Serie $serie): string => $this->normalizarAno($serie->ano)
+                foreach ($turmasPorCurso as $curso => $turmas) {
+                    $turmasPorAno = $turmas->keyBy(
+                        fn (Turma $turma): string => $this->normalizarSerie($turma->serie)
                     );
 
-                    $primeiro = $seriesPorAno->get('1º');
+                    $primeiro = $turmasPorAno->get('1º');
 
                     if (! $primeiro) {
                         continue;
                     }
 
-                    $segundo = $seriesPorAno->get('2º');
-                    $terceiro = $seriesPorAno->get('3º');
+                    $segundo = $turmasPorAno->get('2º');
+                    $terceiro = $turmasPorAno->get('3º');
 
                     if (! $segundo || ! $terceiro) {
                         throw new \RuntimeException(
-                            "Curso {$curso}: séries 1º, 2º e 3º precisam estar cadastradas."
+                            "Curso {$curso}: turmas de 1º, 2º e 3º ano precisam estar cadastradas."
                         );
                     }
 
                     Aluno::query()
-                        ->where('serie_id', $terceiro->id)
+                        ->where('turma_id', $terceiro->id)
                         ->where('concluinte', false)
                         ->update([
                             'concluinte' => true,
@@ -63,14 +63,14 @@ class PromoverAlunos extends Command
                         ]);
 
                     Aluno::query()
-                        ->where('serie_id', $segundo->id)
+                        ->where('turma_id', $segundo->id)
                         ->where('concluinte', false)
-                        ->update(['serie_id' => $terceiro->id]);
+                        ->update(['turma_id' => $terceiro->id]);
 
                     Aluno::query()
-                        ->where('serie_id', $primeiro->id)
+                        ->where('turma_id', $primeiro->id)
                         ->where('concluinte', false)
-                        ->update(['serie_id' => $segundo->id]);
+                        ->update(['turma_id' => $segundo->id]);
                 }
 
                 return true;
@@ -93,8 +93,8 @@ class PromoverAlunos extends Command
         return self::SUCCESS;
     }
 
-    private function normalizarAno(string $ano): string
+    private function normalizarSerie(string $serie): string
     {
-        return trim(str_replace('°', 'º', $ano));
+        return trim(str_replace('°', 'º', $serie));
     }
 }
