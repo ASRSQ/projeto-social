@@ -31,7 +31,9 @@ class EditOcorrencia extends EditRecord
             ];
         }
 
-        unset($data['encaminhamento_diretor'], $data['gravidade'], $data['classificado_em']);
+        if (! Auth::user()?->isAdmin()) {
+            unset($data['encaminhamento_diretor'], $data['gravidade'], $data['classificado_em']);
+        }
         OcorrenciaResource::assertUserCanSave($data);
         return $data;
     }

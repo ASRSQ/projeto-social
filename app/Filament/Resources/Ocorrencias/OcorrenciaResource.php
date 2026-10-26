@@ -41,7 +41,7 @@ class OcorrenciaResource extends Resource
         $user = Auth::user();
         $professorId = $user?->professor_id;
 
-        if ($user?->isProfessorDt()) {
+        if ($user?->isProfessorDt() && ! $user?->isAdmin()) {
             return $schema->components([
                 Section::make('Ocorrência recebida')->columns(2)->schema([
                     Placeholder::make('aluno_resumo')->label('Aluno(a)')->content(fn (?Ocorrencia $record) => $record?->aluno?->nome ?? '—'),
@@ -92,8 +92,8 @@ class OcorrenciaResource extends Resource
                 DatePicker::make('data_encaminhamento')->label('Encaminhado em')->default(now())->disabled()->dehydrated()->native(false)->visible(fn () => Auth::user()?->isAdmin()),
             ]),
             Section::make('Análise do(a) Diretor(a) de Turma')->columns(2)->schema([
-                Textarea::make('encaminhamento_diretor')->label('Encaminhamento do(a) Diretor(a) de Turma')->disabled()->dehydrated(false)->columnSpanFull(),
-                Select::make('gravidade')->label('Classificação')->options(['leve' => 'Leve', 'media' => 'Média', 'grave' => 'Grave', 'gravissima' => 'Gravíssima'])->disabled()->dehydrated(false),
+                Textarea::make('encaminhamento_diretor')->label('Encaminhamento do(a) Diretor(a) de Turma')->disabled(fn () => ! Auth::user()?->isAdmin())->dehydrated(fn () => Auth::user()?->isAdmin())->columnSpanFull(),
+                Select::make('gravidade')->label('Classificação')->options(['leve' => 'Leve', 'media' => 'Média', 'grave' => 'Grave', 'gravissima' => 'Gravíssima'])->disabled(fn () => ! Auth::user()?->isAdmin())->dehydrated(fn () => Auth::user()?->isAdmin()),
             ])->visible(fn (string $operation) => $operation === 'edit'),
         ]);
     }
