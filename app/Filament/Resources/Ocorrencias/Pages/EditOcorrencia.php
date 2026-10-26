@@ -27,7 +27,7 @@ class EditOcorrencia extends EditRecord
             return [
                 'encaminhamento_diretor' => $data['encaminhamento_diretor'],
                 'gravidade' => $data['gravidade'],
-                'classificado_em' => now(),
+                'classificado_em' => $record->classificado_em ?? now(),
             ];
         }
 

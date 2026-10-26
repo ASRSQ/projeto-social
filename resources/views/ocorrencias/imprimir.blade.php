@@ -1,53 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registro de Intervenção Disciplinar — {{ $ocorrencia->aluno->nome }}</title>
+    <title>Ocorrencia-{{ $codigoOcorrencia->codigo }} - Registro de Intervenção Disciplinar</title>
     <style>
-        @page { size: A4 portrait; margin: 11mm 14mm 12mm; }
+        :root { --ink: #111; --line: #333; --muted: #555; --paper: #fff; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        body { margin: 0; color: #101010; font: 10.5pt Arial, Helvetica, sans-serif; line-height: 1.2; }
-        main { margin: 0 auto; max-width: 760px; }
-        .toolbar { display: flex; justify-content: flex-end; margin: 0 auto 12px; max-width: 760px; }
-        .toolbar button { border: 0; border-radius: 4px; background: #176b3a; color: #fff; cursor: pointer; font-size: 10pt; padding: 9px 14px; }
-        .header { align-items: center; border-bottom: 1px solid #222; display: grid; grid-template-columns: 1fr 2.45fr 52px; gap: 12px; min-height: 62px; padding: 0 0 8px; }
-        .government { align-items: center; display: flex; gap: 6px; min-width: 0; }
-        .crest { flex: 0 0 42px; height: 58px; width: 42px; }
-        .government-name { color: #343a40; font-family: Georgia, 'Times New Roman', serif; font-size: 13pt; font-variant: small-caps; font-weight: bold; line-height: .94; }
-        .government-name small { color: #222; display: block; font-family: Georgia, serif; font-size: 6.3pt; font-style: italic; font-variant: normal; font-weight: normal; margin-top: 3px; }
-        .project { font-size: 9pt; text-align: center; }
-        .project strong { display: block; font-size: 9pt; letter-spacing: .16em; margin-bottom: 5px; white-space: nowrap; }
-        .project span { font-size: 8pt; font-weight: bold; text-decoration: underline; white-space: nowrap; }
-        .ppdt-mark { height: 49px; justify-self: end; width: 49px; }
-        h1 { font-size: 15pt; letter-spacing: .04em; margin: 12px 0 20px; text-align: center; }
-        .statement { line-height: 1.22; text-align: justify; }
-        .write { border-bottom: 1px solid #222; display: inline-block; height: 1.1em; line-height: 1.05em; min-width: 75px; padding: 0 3px; text-align: center; vertical-align: baseline; }
-        .w-sm { min-width: 48px; }
-        .w-md { min-width: 100px; }
-        .w-lg { min-width: 175px; }
-        .w-xl { min-width: 250px; }
-        .attitudes { margin: 12px 0 15px 24px; }
-        .attitude { margin: 3px 0; }
-        .mark-box { display: inline-block; min-width: 28px; }
-        .section-title { margin: 13px 0 5px; }
-        .ruled { background-image: linear-gradient(to bottom, transparent calc(100% - 1px), #222 0); background-size: 100% 20px; line-height: 20px; min-height: 80px; overflow-wrap: anywhere; padding: 0 2px; white-space: pre-wrap; }
-        .ruled.measures { min-height: 60px; }
-        .ruled.forwarding { min-height: 60px; }
-        .frequency { display: flex; justify-content: space-between; margin: 5px 8px 17px; }
-        .severity { margin-top: 5px; }
-        .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; text-align: center; }
-        .signature-line { border-top: 1px solid #222; padding-top: 2px; }
-        .signature-name { font-weight: bold; line-height: 1.1; }
-        .signature-caption { line-height: 1.15; }
-        @media print { .toolbar { display: none; } main { max-width: none; } }
+        html, body { margin: 0; padding: 0; background: #e9e9e9; color: var(--ink); font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.25; }
+        .toolbar { width: 210mm; margin: 12px auto; display: flex; justify-content: flex-end; }
+        .toolbar button { border: 1px solid #222; border-radius: 4px; background: #fff; padding: 9px 14px; font-size: 14px; cursor: pointer; }
+        .page { width: 210mm; min-height: 297mm; margin: 0 auto 16px; padding: 12mm 13mm 10mm; background: var(--paper); box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+        .header { display: grid; grid-template-columns: 34mm minmax(0, 1fr) 16mm; align-items: start; gap: 3mm; padding-bottom: 8px; border-bottom: 1.5px solid var(--ink); margin-bottom: 12px; }
+        .header-logo { display: block; width: 100%; height: auto; object-fit: contain; }
+        .header-center { text-align: center; padding-top: 2mm; }
+        .project { font-weight: 700; font-size: 8.5pt; letter-spacing: .25px; margin-bottom: 5px; }
+        .school { font-weight: 700; font-size: 8pt; margin-bottom: 10px; }
+        h1 { margin: 0; font-size: 15pt; letter-spacing: .45px; text-transform: uppercase; }
+        .intro { margin: 0 0 10px; text-align: justify; line-height: 1.55; }
+        .field { display: inline-block; min-height: 1.15em; border-bottom: 1px solid var(--line); vertical-align: baseline; padding: 0 3px; text-align: center; font-weight: 700; position: relative; top: .08em; }
+        .w-professor { min-width: 48mm; } .w-discipline { min-width: 35mm; } .w-series { min-width: 15mm; } .w-class { min-width: 34mm; } .w-student { min-width: 53mm; } .w-number { min-width: 10mm; } .w-date { min-width: 24mm; } .w-time { min-width: 15mm; } .w-place { min-width: 42mm; }
+        .section { margin-top: 9px; break-inside: avoid; }
+        .section-title { font-weight: 700; margin: 0 0 5px; }
+        .choices { display: flex; flex-wrap: wrap; column-gap: 16px; row-gap: 5px; padding-left: 3px; }
+        .choice { white-space: nowrap; }
+        .boxmark { display: inline-flex; align-items: center; justify-content: center; width: 11px; height: 11px; border: 1px solid #111; margin-right: 5px; font-size: 9px; line-height: 1; }
+        .write-area { border: 1px solid var(--line); width: 100%; margin-top: 4px; padding: 0 1.5mm; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 700; line-height: 7.35mm; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 7.2mm, #b9b9b9 7.2mm, #b9b9b9 7.35mm); }
+        .description-area { min-height: 35mm; } .measures-area { min-height: 22mm; } .referral-area { min-height: 25mm; }
+        .severity { margin-top: 6px; }
+        .signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18mm; margin-top: 13mm; break-inside: avoid; }
+        .signature { text-align: center; border-top: 1px solid var(--ink); padding-top: 5px; min-height: 12mm; }
+        .signature strong { display: block; font-size: 9.5pt; }
+        .signature span { display: block; font-size: 8.5pt; margin-top: 4px; }
+        .footer-note { margin-top: 7px; color: var(--muted); font-size: 8pt; text-align: center; }
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+            html, body { width: 210mm; min-height: 297mm; background: #fff; font-size: 9.5pt; }
+            .toolbar { display: none !important; }
+            .page { width: 210mm; min-height: 297mm; margin: 0; padding: 11mm 13mm 9mm; box-shadow: none; }
+            .section, .signature-grid, .header { break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
-    <div class="toolbar"><button type="button" onclick="window.print()">Imprimir / Salvar como PDF</button></div>
     @php
         $atitudesSelecionadas = $ocorrencia->atitudes_tomadas ?? [];
-        $atitudeMarcada = fn (string $codigo): string => in_array($codigo, $atitudesSelecionadas, true) ? 'X' : ' ';
         $frequencias = [
             'primeira_vez' => '1ª vez',
             'reincidente_pouco_frequente' => 'Reincidente (pouco frequente)',
@@ -55,89 +52,51 @@
         ];
         $gravidades = ['leve' => 'Leve', 'media' => 'Média', 'grave' => 'Grave', 'gravissima' => 'Gravíssima'];
     @endphp
-    <main>
+    <div class="toolbar"><button type="button" onclick="window.print()">Imprimir / Salvar como PDF</button></div>
+    <main class="page">
         <header class="header">
-            <div class="government">
-                <svg class="crest" viewBox="0 0 48 66" role="img" aria-label="Brasão do Estado do Ceará">
-                    <path d="M8 9 13 3h22l5 6-4 5H12z" fill="#d7b84b" stroke="#7d6521" stroke-width="1.5"/>
-                    <path d="M6 14h36l-3 30-15 17L9 44z" fill="#f4f0dc" stroke="#356944" stroke-width="3"/>
-                    <path d="M10 17h14v20H9z" fill="#2875a8"/><path d="M24 17h13l-2 20H24z" fill="#e8d34b"/>
-                    <path d="M10 37h14v17L11 43z" fill="#ce3e43"/><path d="M24 37h11l-1 7-10 10z" fill="#38864c"/>
-                    <circle cx="24" cy="29" r="5" fill="#f5f1df" stroke="#27633d" stroke-width="1.5"/>
-                    <path d="M24 24v10m-4-5h8" stroke="#27633d" stroke-width="1.4"/>
-                </svg>
-                <div class="government-name">GOVERNO DO<br>ESTADO DO CEARÁ<small>Secretaria da Educação</small></div>
+            <img class="header-logo" src="data:image/png;base64,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" alt="Governo do Estado do Ceará — Secretaria da Educação">
+            <div class="header-center">
+                <div class="project">PROJETO PROFESSOR DIRETOR DE TURMA – PPDT</div>
+                <div class="school">ESCOLA: EEEP MONSENHOR LUÍS XIMENES FREIRE</div>
+                <h1>Registro de Intervenção Disciplinar</h1>
             </div>
-            <div class="project">
-                <strong>PROJETO PROFESSOR DIRETOR DE TURMA – PPDT</strong>
-                <span>ESCOLA: EEEP MONSENHOR LUÍS XIMENES FREIRE</span>
-            </div>
-            <svg class="ppdt-mark" viewBox="0 0 64 64" role="img" aria-label="Símbolo do PPDT">
-                <rect x="1" y="1" width="30" height="30" rx="3" fill="#2788dc"/>
-                <rect x="33" y="1" width="30" height="30" rx="3" fill="#079b69"/>
-                <rect x="1" y="33" width="30" height="30" rx="3" fill="#ee3158"/>
-                <rect x="33" y="33" width="30" height="30" rx="3" fill="#f2d51f"/>
-                <path d="M13 42 31 47 51 41 49 52 32 58 14 52z" fill="#fff" stroke="#e4e4e4" stroke-width="1"/>
-                <path d="M13 42 31 47v11L14 52zm38-1-20 6v11l18-6z" fill="#f8f8f8" stroke="#c7c7c7" stroke-width="1"/>
-                <circle cx="32" cy="25" r="7" fill="#f7a627" stroke="#fff" stroke-width="2"/>
-                <path d="M27 32h10l5 10-10 4-10-4z" fill="#f7a627" stroke="#fff" stroke-width="2"/>
-            </svg>
+            <img class="header-logo" src="data:image/png;base64,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" alt="Logotipo do programa">
         </header>
-
-        <h1>REGISTRO DE INTERVENÇÃO DISCIPLINAR</h1>
-
-        <div class="statement">
-            <span class="write w-lg">{{ $ocorrencia->professor->nome }}</span>, professor(a) que leciona a disciplina
-            <span class="write w-md">{{ $ocorrencia->disciplina?->nome }}</span>, vem, por este meio, informar ao(à) diretor(a) de turma do/da
-            <span class="write w-md">{{ $ocorrencia->turma->curso }}</span>, ano/série
-            <span class="write w-sm">{{ $ocorrencia->turma->serie }}</span>, da turma
-            <span class="write w-md">{{ $ocorrencia->turma->serie }} — {{ $ocorrencia->turma->curso }}</span>, que o(a) aluno(a)
-            <span class="write w-lg">{{ $ocorrencia->aluno->nome }}</span>, nº
-            <span class="write w-sm">{{ $ocorrencia->aluno->numero }}</span>, teve um comportamento inadequado no dia
-            <span class="write w-sm">{{ $ocorrencia->data_ocorrido?->format('d/m/Y') }}</span>, pelas
-            <span class="write w-sm">{{ substr((string) $ocorrencia->hora_ocorrido, 0, 5) }}</span> horas, no(a)
-            <span class="write w-md">{{ $ocorrencia->local_ocorrido }}</span>, local onde se encontrava. Em consequência disso, tomei a seguinte atitude:
-        </div>
-
-        <div class="attitudes">
-            <div class="attitude"><span class="mark-box">( {{ $atitudeMarcada('ordem_saida') }} )</span> ordem de saída da sala de aula</div>
-            <div class="attitude"><span class="mark-box">( {{ $atitudeMarcada('advertencia') }} )</span> advertência</div>
-            <div class="attitude"><span class="mark-box">( {{ $atitudeMarcada('outro') }} )</span> outro(s): <span class="write w-xl">{{ $ocorrencia->outra_atitude }}</span></div>
-        </div>
-
-        <div class="section-title">Descrição da situação:</div>
-        <div class="ruled">{{ $ocorrencia->descricao_situacao }}</div>
-
-        <div class="section-title">O comportamento observado neste(a) aluno(a) é:</div>
-        <div class="frequency">
+        <p class="intro">
+            <span class="field w-professor">{{ $ocorrencia->professor->nome }}</span>, professor(a) que leciona a disciplina
+            <span class="field w-discipline">{{ $ocorrencia->disciplina?->nome }}</span>, vem, por este meio, informar ao(à)
+            diretor(a) de turma do(a) <span class="field w-series">{{ $ocorrencia->turma->serie }}</span> ano/série,
+            da turma <span class="field w-class">{{ $ocorrencia->turma->curso }}</span>, que o(a) aluno(a)
+            <span class="field w-student">{{ $ocorrencia->aluno->nome }}</span>, nº <span class="field w-number">{{ $ocorrencia->aluno->numero }}</span>,
+            teve um comportamento inadequado no dia <span class="field w-date">{{ $ocorrencia->data_ocorrido?->format('d/m/Y') }}</span>,
+            pelas <span class="field w-time">{{ substr((string) $ocorrencia->hora_ocorrido, 0, 5) }}</span> horas, no(a)
+            <span class="field w-place">{{ $ocorrencia->local_ocorrido }}</span>, local onde se encontrava. Em consequência disso, tomei a seguinte atitude:
+        </p>
+        <section class="section"><div class="choices">
+            <span class="choice"><span class="boxmark">{{ in_array('ordem_saida', $atitudesSelecionadas, true) ? 'X' : '' }}</span>Ordem de saída da sala de aula</span>
+            <span class="choice"><span class="boxmark">{{ in_array('advertencia', $atitudesSelecionadas, true) ? 'X' : '' }}</span>Advertência</span>
+            <span class="choice"><span class="boxmark">{{ in_array('outro', $atitudesSelecionadas, true) ? 'X' : '' }}</span>Outro(s): {{ $ocorrencia->outra_atitude }}</span>
+        </div></section>
+        <section class="section"><p class="section-title">Descrição da situação:</p><div class="write-area description-area">{{ $ocorrencia->descricao_situacao }}</div></section>
+        <section class="section"><p class="section-title">O comportamento observado neste(a) aluno(a) é:</p><div class="choices">
             @foreach ($frequencias as $codigo => $rotulo)
-                <span>( {{ $ocorrencia->frequencia === $codigo ? 'X' : ' ' }} ) {{ $rotulo }}</span>
+                <span class="choice"><span class="boxmark">{{ $ocorrencia->frequencia === $codigo ? 'X' : '' }}</span>{{ $rotulo }}</span>
             @endforeach
-        </div>
-
-        <div class="section-title">Tendo em vista a situação descrita acima, considero conveniente que o(a) diretor(a) de turma tome a(s) seguinte(s) medida(s):</div>
-        <div class="ruled measures">{{ $ocorrencia->medidas_sugeridas }}</div>
-
-        <div class="section-title">Encaminhamentos do(a) Professor(a) Diretor(a) de Turma:</div>
-        <div class="ruled forwarding">{{ $ocorrencia->encaminhamento_diretor }}</div>
-        <div class="severity"><strong>Classificação:</strong>
-            @foreach ($gravidades as $codigo => $rotulo)
-                <span style="margin-left: 12px">( {{ $ocorrencia->gravidade === $codigo ? 'X' : ' ' }} ) {{ $rotulo }}</span>
-            @endforeach
-        </div>
-
-        <div class="signatures">
-            <div>
-                <div class="signature-line">&nbsp;</div>
-                <div class="signature-name">{{ $ocorrencia->professor->nome }}</div>
-                <div class="signature-caption">Professor(a)<br>(Encaminhado em: {{ $ocorrencia->data_encaminhamento?->format('d/m/Y') }})</div>
+        </div></section>
+        <section class="section"><p class="section-title">Tendo em vista a situação descrita acima, considero conveniente que o(a) diretor(a) de turma tome a(s) seguinte(s) medida(s):</p><div class="write-area measures-area">{{ $ocorrencia->medidas_sugeridas }}</div></section>
+        <section class="section"><p class="section-title">Encaminhamentos do(a) Professor(a) Diretor(a) de Turma:</p><div class="write-area referral-area">{{ $ocorrencia->encaminhamento_diretor }}</div>
+            <div class="severity"><strong>Classificação:</strong>
+                @foreach ($gravidades as $codigo => $rotulo)
+                    <span class="choice" style="margin-left: 10px"><span class="boxmark">{{ $ocorrencia->gravidade === $codigo ? 'X' : '' }}</span>{{ $rotulo }}</span>
+                @endforeach
             </div>
-            <div>
-                <div class="signature-line">&nbsp;</div>
-                <div class="signature-name">{{ $ocorrencia->turma->diretorTurma?->nome }}</div>
-                <div class="signature-caption">Diretor(a) de Turma<br>(Recebido em: {{ $ocorrencia->classificado_em?->format('d/m/Y') }})</div>
-            </div>
+        </section>
+        <div class="signature-grid">
+            <div class="signature"><strong>{{ $ocorrencia->professor->nome }}</strong><span>Professor(a)<br>Encaminhado em: {{ $ocorrencia->data_encaminhamento?->format('d/m/Y') ?? '____/____/________' }}</span></div>
+            <div class="signature"><strong>{{ $ocorrencia->turma->diretorTurma?->nome ?? 'Diretor(a) de Turma' }}</strong><span>Diretor(a) de Turma<br>Recebido em: {{ $ocorrencia->classificado_em?->format('d/m/Y') ?? '____/____/________' }}</span></div>
         </div>
+        <div class="footer-note">Registro de uso escolar — preencher os campos pertinentes antes de arquivar.</div>
     </main>
 </body>
 </html>

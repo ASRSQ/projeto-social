@@ -165,7 +165,9 @@ class OcorrenciaResource extends Resource
     public static function canEdit(Model $record): bool
     {
         $user = Auth::user();
-        return $user?->isAdmin() || ($user?->isProfessorDt() && ! $record->classificado_em && $user->turmasComoDiretor()->whereKey($record->turma_id)->exists());
+        return $user?->isAdmin()
+            || ($user?->isProfessor() && (int) $record->professor_id === (int) $user->professor_id)
+            || ($user?->isProfessorDt() && $user->turmasComoDiretor()->whereKey($record->turma_id)->exists());
     }
 
     public static function canDelete(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
@@ -197,7 +199,6 @@ class OcorrenciaResource extends Resource
     {
         $user = Auth::user();
         abort_unless($user?->isProfessorDt(), 403);
-        abort_unless(! $record->classificado_em, 403);
         abort_unless($user->turmasComoDiretor()->whereKey($record->turma_id)->exists(), 403);
         abort_unless(filled($data['encaminhamento_diretor'] ?? null), 422);
         abort_unless(in_array($data['gravidade'] ?? null, ['leve', 'media', 'grave', 'gravissima'], true), 422);

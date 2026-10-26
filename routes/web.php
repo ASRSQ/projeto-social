@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use App\Models\Ocorrencia;
+use App\Models\CodigoOcorrencia;
 use App\Http\Middleware\AuthenticateFilamentPanel;
 
 Route::get('/', function () {
@@ -27,7 +28,8 @@ Route::get('/ocorrencias/{ocorrencia}/imprimir', function (Ocorrencia $ocorrenci
 
     abort_unless($podeImprimir && $ocorrencia->classificado_em, 403);
 
+    $codigoOcorrencia = CodigoOcorrencia::para($ocorrencia);
     $ocorrencia->load(['aluno', 'professor', 'turma.diretorTurma']);
 
-    return view('ocorrencias.imprimir', compact('ocorrencia'));
+    return view('ocorrencias.imprimir', compact('ocorrencia', 'codigoOcorrencia'));
 })->middleware(AuthenticateFilamentPanel::class)->name('ocorrencias.imprimir');
