@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\AuthenticateFilamentPanel;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -13,6 +13,10 @@ use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\View\PanelsRenderHook;
+use App\Filament\Auth\Pages\RegisterAluno;
+use App\Filament\Auth\Pages\AdminProfile;
+use App\Filament\Auth\Pages\AdminResetPassword;
+use Filament\Auth\Pages\PasswordReset\RequestPasswordReset;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -29,6 +33,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration(RegisterAluno::class)
+            ->passwordReset(RequestPasswordReset::class, AdminResetPassword::class)
+            ->profile(AdminProfile::class)
+            ->databaseNotifications()
           ->colors([
     'primary' => '#006400',   // Verde escuro: barra superior e botões principais
     'success' => '#2E8B57',   // Verde médio para mensagens de sucesso
@@ -62,7 +70,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                AuthenticateFilamentPanel::class,
             ]);
     }
 }

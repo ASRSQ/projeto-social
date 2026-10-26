@@ -12,6 +12,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class ProfessorResource extends Resource
 {
@@ -113,6 +115,12 @@ class ProfessorResource extends Resource
     {
         return parent::getEloquentQuery()->with(['turmas', 'turmasComoDiretor']);
     }
+
+    public static function canViewAny(): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canCreate(): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canEdit(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canDelete(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canDeleteAny(): bool { return Auth::user()?->isAdmin() ?? false; }
 
     public static function getPages(): array
     {

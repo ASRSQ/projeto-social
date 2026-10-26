@@ -10,6 +10,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class DisciplinaResource extends Resource
 {
@@ -61,6 +63,12 @@ class DisciplinaResource extends Resource
                 ]),
             ]);
     }
+
+    public static function canViewAny(): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canCreate(): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canEdit(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canDelete(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canDeleteAny(): bool { return Auth::user()?->isAdmin() ?? false; }
 
     public static function getPages(): array
     {

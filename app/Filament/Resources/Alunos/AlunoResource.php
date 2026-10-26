@@ -19,6 +19,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class AlunoResource extends Resource
 {
@@ -78,6 +81,20 @@ class AlunoResource extends Resource
                     )),
             ]);
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Auth::user();
+        return $user?->isAdmin()
+            ? parent::getEloquentQuery()
+            : parent::getEloquentQuery()->whereIn('turma_id', $user?->turmasComoDiretor()->select('id') ?? []);
+    }
+
+    public static function canViewAny(): bool { return Auth::user()?->isAdmin() || Auth::user()?->isProfessorDt(); }
+    public static function canCreate(): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canEdit(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canDelete(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canDeleteAny(): bool { return Auth::user()?->isAdmin() ?? false; }
 
     public static function table(Table $table): Table
     {
