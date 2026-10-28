@@ -41,7 +41,7 @@ class OcorrenciaResource extends Resource
         $user = Auth::user();
         $professorId = $user?->professor_id;
 
-        if ($user?->isProfessorDt() && ! $user?->isAdmin()) {
+        if ($user?->isProfessorDt() && ! $user?->isAdmin() && $schema->getOperation() === 'edit') {
             return $schema->components([
                 Section::make('Ocorrência recebida')->columns(2)->schema([
                     Placeholder::make('aluno_resumo')->label('Aluno(a)')->content(fn (?Ocorrencia $record) => $record?->aluno?->nome ?? '—'),
@@ -159,7 +159,7 @@ class OcorrenciaResource extends Resource
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->isAdmin() || Auth::user()?->isProfessor();
+        return Auth::user()?->isAdmin() || Auth::user()?->isProfessor() || Auth::user()?->isProfessorDt();
     }
 
     public static function canEdit(Model $record): bool
