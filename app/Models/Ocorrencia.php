@@ -27,6 +27,11 @@ class Ocorrencia extends Model
         ];
     }
 
+    public function classificada(): bool
+    {
+        return filled($this->encaminhamento_diretor) && filled($this->gravidade);
+    }
+
     protected static function booted(): void
     {
         static::creating(function (Ocorrencia $ocorrencia): void {

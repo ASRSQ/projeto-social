@@ -4,6 +4,7 @@ namespace App\Filament\Auth\Pages;
 
 use App\Models\Aluno;
 use App\Models\User;
+use App\Rules\ValidCpf;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
@@ -28,7 +29,11 @@ class Login extends BaseLogin
             $this->getEmailFormComponent()->visible(fn (Get $get) => $get('tipo') !== 'aluno'),
             $this->getPasswordFormComponent()->visible(fn (Get $get) => $get('tipo') !== 'aluno'),
             TextInput::make('cpf')->label('CPF')->mask('999.999.999-99')
-                ->stripCharacters(['.', '-'])->length(11)->required()
+                ->stripCharacters(['.', '-'])->required()
+                ->rules([
+                    'digits:11',
+                    new ValidCpf(),
+                ])
                 ->visible(fn (Get $get) => $get('tipo') === 'aluno'),
             DatePicker::make('data_nascimento')->label('Data de nascimento')
                 ->required()->maxDate(today())->displayFormat('d/m/Y')

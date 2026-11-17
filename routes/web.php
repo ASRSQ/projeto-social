@@ -26,27 +26,34 @@ Route::get('/', function () {
 Route::get('/ocorrencias/{ocorrencia}/imprimir', function (Ocorrencia $ocorrencia) {
     $user = Auth::user();
     $podeImprimir = $user?->isAdmin()
-        || ($user?->isProfessorDt() && $user->turmasComoDiretor()->whereKey($ocorrencia->turma_id)->exists());
+        || ($user?->isProfessorDt() && $user->turmasComoDiretor()->whereKey($ocorrencia->turma_id)->exists())
+        || ($user?->isProfessor() && (int) $ocorrencia->professor_id === (int) $user->professor_id);
 
-    abort_unless($podeImprimir && $ocorrencia->classificado_em, 403);
+    abort_unless($podeImprimir && $ocorrencia->classificada(), 403);
 
     $codigoOcorrencia = CodigoOcorrencia::para($ocorrencia);
-    $ocorrencia->load(['aluno', 'professor', 'turma.diretorTurma']);
+    $ocorrencia->load(['aluno', 'professor', 'disciplina', 'turma.diretorTurma']);
 
     return view('ocorrencias.imprimir', compact('ocorrencia', 'codigoOcorrencia'));
 })->middleware(AuthenticateFilamentPanel::class)->name('ocorrencias.imprimir');
 
 Route::get('/ocorrencias/selecionar-impressao', function () {
     $user = Auth::user();
-    abort_unless($user?->isAdmin() || $user?->isProfessorDt(), 403);
+    abort_unless($user?->isAdmin() || $user?->isProfessorDt() || $user?->isProfessor(), 403);
 
     $query = Ocorrencia::query()
-        ->whereNotNull('classificado_em')
+        ->whereNotNull('gravidade')
+        ->whereNotNull('encaminhamento_diretor')
+        ->where('encaminhamento_diretor', '<>', '')
         ->with(['aluno', 'turma'])
         ->orderByDesc('data_ocorrido');
 
     if (! $user->isAdmin()) {
-        $query->whereIn('turma_id', $user->turmasComoDiretor()->select('id'));
+        if ($user->isProfessorDt()) {
+            $query->whereIn('turma_id', $user->turmasComoDiretor()->select('id'));
+        } else {
+            $query->where('professor_id', $user->professor_id);
+        }
     }
 
     $ocorrencias = $query->get();
@@ -56,7 +63,7 @@ Route::get('/ocorrencias/selecionar-impressao', function () {
 
 Route::get('/ocorrencias/imprimir-lote', function (Request $request) {
     $user = Auth::user();
-    abort_unless($user?->isAdmin() || $user?->isProfessorDt(), 403);
+    abort_unless($user?->isAdmin() || $user?->isProfessorDt() || $user?->isProfessor(), 403);
 
     $validated = Validator::make($request->query(), [
         'ids' => ['required', 'array', 'min:2'],
@@ -66,16 +73,22 @@ Route::get('/ocorrencias/imprimir-lote', function (Request $request) {
     $ids = array_map('intval', $validated['ids']);
     $ocorrenciasPorId = Ocorrencia::query()
         ->whereIn('id', $ids)
-        ->whereNotNull('classificado_em')
+        ->whereNotNull('gravidade')
+        ->whereNotNull('encaminhamento_diretor')
+        ->where('encaminhamento_diretor', '<>', '')
         ->with(['aluno', 'professor', 'disciplina', 'turma.diretorTurma'])
         ->get()
         ->keyBy('id');
 
     abort_unless($ocorrenciasPorId->count() === count($ids), 403);
 
-    if (! $user->isAdmin()) {
+    if ($user->isProfessorDt()) {
         foreach ($ocorrenciasPorId as $ocorrencia) {
             abort_unless($user->turmasComoDiretor()->whereKey($ocorrencia->turma_id)->exists(), 403);
+        }
+    } elseif ($user->isProfessor()) {
+        foreach ($ocorrenciasPorId as $ocorrencia) {
+            abort_unless((int) $ocorrencia->professor_id === (int) $user->professor_id, 403);
         }
     }
 

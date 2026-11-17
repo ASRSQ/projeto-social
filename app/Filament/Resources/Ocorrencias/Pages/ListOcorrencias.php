@@ -19,7 +19,7 @@ class ListOcorrencias extends ListRecords
                 ->label('Imprimir mais de uma ocorrência')
                 ->icon('heroicon-o-printer')
                 ->url(route('ocorrencias.selecionar-lote'))
-                ->visible(fn () => Auth::user()?->isAdmin() || Auth::user()?->isProfessorDt()),
+                ->visible(fn () => Auth::user()?->isAdmin() || Auth::user()?->isProfessorDt() || Auth::user()?->isProfessor()),
             CreateAction::make()->label('Registrar ocorrência'),
         ];
     }

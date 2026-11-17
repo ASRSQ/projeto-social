@@ -107,15 +107,21 @@ class OcorrenciaResource extends Resource
             Tables\Columns\TextColumn::make('professor.nome')->label('Professor(a)')->searchable(),
             Tables\Columns\TextColumn::make('gravidade')->label('Classificação')->formatStateUsing(fn (?string $state) => ['leve' => 'Leve', 'media' => 'Média', 'grave' => 'Grave', 'gravissima' => 'Gravíssima'][$state] ?? 'Aguardando DT')->badge(),
             Tables\Columns\TextColumn::make('atitudes_tomadas')->label('Atitude(s)')->state(fn (Ocorrencia $record) => collect($record->atitudes_tomadas)->map(fn ($item) => $item === 'outro' ? ($record->outra_atitude ?: 'Outro') : ['ordem_saida' => 'Ordem de saída', 'advertencia' => 'Advertência'][$item] ?? $item)->join(', '))->wrap(),
-        ])->defaultSort('data_ocorrido', 'desc')->recordActions([
-            Actions\ViewAction::make(),
-            Actions\EditAction::make(),
+        ])->defaultSort('data_ocorrido', 'desc')
+            ->recordUrl(fn (Ocorrencia $record) => static::getUrl('view', ['record' => $record]))
+            ->recordActions([
+            Actions\ViewAction::make()->visible(fn (Ocorrencia $record) => static::canView($record)),
+            Actions\EditAction::make()->visible(fn (Ocorrencia $record) => static::canEdit($record)),
             Actions\Action::make('imprimir')
                 ->label('Imprimir')
                 ->icon('heroicon-o-printer')
+                ->button()
                 ->url(fn (Ocorrencia $record) => route('ocorrencias.imprimir', $record))
                 ->openUrlInNewTab()
-                ->visible(fn (Ocorrencia $record) => filled($record->classificado_em) && (Auth::user()?->isAdmin() || Auth::user()?->isProfessorDt())),
+                ->visible(fn (Ocorrencia $record) => $record->classificada()
+                    && (Auth::user()?->isAdmin()
+                        || Auth::user()?->isProfessorDt()
+                        || (Auth::user()?->isProfessor() && (int) $record->professor_id === (int) Auth::user()->professor_id))),
         ])->toolbarActions([
             Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()->visible(fn () => Auth::user()?->isAdmin())])->visible(fn () => Auth::user()?->isAdmin()),
         ]);
@@ -129,12 +135,17 @@ class OcorrenciaResource extends Resource
             TextEntry::make('professor.nome')->label('Professor(a)'),
             TextEntry::make('turma')->label('Turma')->state(fn (Ocorrencia $record) => "{$record->turma->serie} - {$record->turma->curso}"),
             TextEntry::make('aluno.nome')->label('Aluno(a)'),
+            TextEntry::make('disciplina.nome')->label('Disciplina'),
+            TextEntry::make('local_ocorrido')->label('Local do ocorrido'),
             TextEntry::make('atitudes_tomadas')->label('Atitude(s)')->formatStateUsing(fn ($state, Ocorrencia $record) => collect($state)->map(fn ($item) => $item === 'outro' ? ($record->outra_atitude ?: 'Outro') : ['ordem_saida' => 'Ordem de saída', 'advertencia' => 'Advertência'][$item] ?? $item)->join(', ')),
+            TextEntry::make('outra_atitude')->label('Outra atitude')->placeholder('—'),
             TextEntry::make('descricao_situacao')->label('Descrição da situação')->columnSpanFull(),
             TextEntry::make('frequencia')->label('Comportamento observado')->formatStateUsing(fn ($state) => ['primeira_vez' => '1ª vez', 'reincidente_pouco_frequente' => 'Reincidente (pouco frequente)', 'reincidente_frequente' => 'Reincidente (frequente)'][$state] ?? $state),
             TextEntry::make('medidas_sugeridas')->label('Medidas sugeridas')->columnSpanFull(),
+            TextEntry::make('data_encaminhamento')->label('Encaminhado em')->date('d/m/Y'),
             TextEntry::make('encaminhamento_diretor')->label('Encaminhamento do(a) Diretor(a) de Turma')->placeholder('Aguardando análise do DT')->columnSpanFull(),
             TextEntry::make('gravidade')->label('Classificação')->formatStateUsing(fn ($state) => ['leve' => 'Leve', 'media' => 'Média', 'grave' => 'Grave', 'gravissima' => 'Gravíssima'][$state] ?? 'Aguardando análise'),
+            TextEntry::make('classificado_em')->label('Classificado em')->dateTime('d/m/Y H:i'),
         ]);
     }
 
@@ -168,6 +179,16 @@ class OcorrenciaResource extends Resource
         return $user?->isAdmin()
             || ($user?->isProfessor() && (int) $record->professor_id === (int) $user->professor_id)
             || ($user?->isProfessorDt() && $user->turmasComoDiretor()->whereKey($record->turma_id)->exists());
+    }
+
+    public static function canView(Model $record): bool
+    {
+        $user = Auth::user();
+
+        return $user?->isAdmin()
+            || ($user?->isProfessor() && (int) $record->professor_id === (int) $user->professor_id)
+            || ($user?->isProfessorDt() && $user->turmasComoDiretor()->whereKey($record->turma_id)->exists())
+            || ($user?->isAluno() && (int) $record->aluno_id === (int) $user->aluno_id);
     }
 
     public static function canDelete(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
@@ -209,6 +230,7 @@ class OcorrenciaResource extends Resource
         return [
             'index' => Pages\ListOcorrencias::route('/'),
             'create' => Pages\CreateOcorrencia::route('/create'),
+            'view' => Pages\ViewOcorrencia::route('/{record}'),
             'edit' => Pages\EditOcorrencia::route('/{record}/edit'),
         ];
     }

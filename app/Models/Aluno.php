@@ -30,6 +30,32 @@ class Aluno extends Model
         ];
     }
 
+    public static function cpfValido(?string $cpf): bool
+    {
+        $cpf = preg_replace('/\D/', '', (string) $cpf);
+
+        if (strlen($cpf) !== 11 || preg_match('/^(\d)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        for ($digito = 9; $digito <= 10; $digito++) {
+            $soma = 0;
+
+            for ($indice = 0; $indice < $digito; $indice++) {
+                $soma += (int) $cpf[$indice] * (($digito + 1) - $indice);
+            }
+
+            $resto = ($soma * 10) % 11;
+            $verificador = $resto === 10 ? 0 : $resto;
+
+            if ((int) $cpf[$digito] !== $verificador) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     protected static function booted(): void
     {
         static::saving(function (Aluno $aluno): void {

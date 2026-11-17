@@ -7,6 +7,7 @@ use App\Filament\Resources\Alunos\Pages\EditAluno;
 use App\Filament\Resources\Alunos\Pages\ListAlunos;
 use App\Models\Aluno;
 use App\Models\Turma;
+use App\Rules\ValidCpf;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -62,7 +63,11 @@ class AlunoResource extends Resource
                     ->label('CPF')
                     ->mask('999.999.999-99')
                     ->stripCharacters(['.', '-'])
-                    ->length(11)
+                    ->required()
+                    ->rules([
+                        'digits:11',
+                        new ValidCpf(),
+                    ])
                     ->unique(ignoreRecord: true)
                     ->helperText('Necessário para o acesso do aluno ao sistema.'),
 

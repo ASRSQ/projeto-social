@@ -27,7 +27,7 @@ class AlunoLoginTest extends TestCase
 
         return Aluno::create([
             'nome' => 'Aluno Teste', 'matricula' => '1234567',
-            'cpf' => '123.456.789-01', 'data_nascimento' => '2008-05-10',
+            'cpf' => '529.982.247-25', 'data_nascimento' => '2008-05-10',
             'turma_id' => $turma->id,
         ]);
     }
@@ -35,7 +35,7 @@ class AlunoLoginTest extends TestCase
     private function login(string $nascimento = '2008-05-10')
     {
         return Livewire::test(Login::class)->fillForm([
-            'tipo' => 'aluno', 'cpf' => '123.456.789-01',
+            'tipo' => 'aluno', 'cpf' => '529.982.247-25',
             'data_nascimento' => $nascimento,
         ])->call('authenticate');
     }
@@ -43,7 +43,7 @@ class AlunoLoginTest extends TestCase
     public function test_aluno_entra_sem_cadastro_e_reutiliza_a_conta(): void
     {
         $aluno = $this->aluno();
-        $this->assertSame('12345678901', $aluno->cpf);
+        $this->assertSame('52998224725', $aluno->cpf);
         $this->login()->assertHasNoFormErrors();
         $this->assertAuthenticated();
         $this->assertSame($aluno->id, auth()->user()->aluno_id);
