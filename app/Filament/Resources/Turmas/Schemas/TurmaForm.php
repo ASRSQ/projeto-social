@@ -20,7 +20,6 @@ class TurmaForm
                 Select::make('diretor_turma_id')
                     ->label('Diretor(a) de Turma')
                     ->relationship('diretorTurma', 'nome')
-                    ->required()
                     ->searchable()
                     ->preload(),
             ]);

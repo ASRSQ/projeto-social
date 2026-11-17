@@ -43,7 +43,6 @@ class TurmaResource extends Resource
                 Forms\Components\Select::make('diretor_turma_id')
                     ->label('Diretor(a) de Turma')
                     ->relationship('diretorTurma', 'nome')
-                    ->required()
                     ->searchable()
                     ->preload(),
             ]);
