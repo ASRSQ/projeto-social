@@ -11,11 +11,12 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -57,6 +58,19 @@ class AlunoResource extends Resource
                     ->maxLength(7)
                     ->unique(ignoreRecord: true),
 
+                TextInput::make('cpf')
+                    ->label('CPF')
+                    ->mask('999.999.999-99')
+                    ->stripCharacters(['.', '-'])
+                    ->length(11)
+                    ->unique(ignoreRecord: true)
+                    ->helperText('Necessário para o acesso do aluno ao sistema.'),
+
+                DatePicker::make('data_nascimento')
+                    ->label('Data de nascimento')
+                    ->maxDate(today())
+                    ->displayFormat('d/m/Y'),
+
                 TextInput::make('numero')
                     ->label('Número da chamada')
                     ->disabled()
@@ -85,16 +99,36 @@ class AlunoResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
+
         return $user?->isAdmin()
             ? parent::getEloquentQuery()
             : parent::getEloquentQuery()->whereIn('turma_id', $user?->turmasComoDiretor()->select('id') ?? []);
     }
 
-    public static function canViewAny(): bool { return Auth::user()?->isAdmin() || Auth::user()?->isProfessorDt(); }
-    public static function canCreate(): bool { return Auth::user()?->isAdmin() ?? false; }
-    public static function canEdit(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
-    public static function canDelete(Model $record): bool { return Auth::user()?->isAdmin() ?? false; }
-    public static function canDeleteAny(): bool { return Auth::user()?->isAdmin() ?? false; }
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->isAdmin() || Auth::user()?->isProfessorDt();
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->isAdmin() ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Auth::user()?->isAdmin() ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()?->isAdmin() ?? false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return Auth::user()?->isAdmin() ?? false;
+    }
 
     public static function table(Table $table): Table
     {
@@ -109,6 +143,16 @@ class AlunoResource extends Resource
                     ->label('Matrícula')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('cpf')
+                    ->label('CPF')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('data_nascimento')
+                    ->label('Data de nascimento')
+                    ->date('d/m/Y')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('numero')
                     ->label('Nº chamada')

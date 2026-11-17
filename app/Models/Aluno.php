@@ -13,6 +13,8 @@ class Aluno extends Model
     protected $fillable = [
         'nome',
         'matricula',
+        'cpf',
+        'data_nascimento',
         'numero',
         'turma_id',
         'concluinte',
@@ -22,6 +24,7 @@ class Aluno extends Model
     protected function casts(): array
     {
         return [
+            'data_nascimento' => 'date',
             'concluinte' => 'boolean',
             'concluido_em' => 'date',
         ];
@@ -29,6 +32,10 @@ class Aluno extends Model
 
     protected static function booted(): void
     {
+        static::saving(function (Aluno $aluno): void {
+            $aluno->cpf = filled($aluno->cpf) ? preg_replace('/\D/', '', $aluno->cpf) : null;
+        });
+
         static::saved(function (Aluno $aluno): void {
             $turmas = array_unique(array_filter([
                 $aluno->getOriginal('turma_id'),
